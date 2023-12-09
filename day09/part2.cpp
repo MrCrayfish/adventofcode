@@ -28,14 +28,13 @@ void GenerateSequence(Report &report, const std::vector<int> &input) {
 }
 
 void GeneratePredictions(Report &report) {
-    std::vector<std::vector<int>> sequences;
-    sequences = report.sequences;
-    sequences[sequences.size() - 1].insert(sequences[sequences.size() - 1].begin(), 0);
-    for (int i = sequences.size() - 2; i >= 0; i--) {
-        int a = sequences[i].front();
-        int b = sequences[i + 1].front();
+    std::vector<std::vector<int>> *seq = &report.sequences;
+    (*seq)[seq->size() - 1].insert((*seq)[seq->size() - 1].begin(), 0);
+    for (int i = seq->size() - 2; i >= 0; i--) {
+        int a = (*seq)[i].front();
+        int b = (*seq)[i + 1].front();
         int p = a - b;
-        sequences[i].insert(sequences[i].begin(), p);
+        (*seq)[i].insert((*seq)[i].begin(), p);
     }
 }
 
