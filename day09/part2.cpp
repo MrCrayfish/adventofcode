@@ -10,7 +10,7 @@ struct Report {
     std::vector<std::vector<int>> sequences;
 };
 
-void GenerateSequence(std::vector<std::vector<int>> &sequences, const std::vector<int> &input) {
+void GenerateSequence(Report &report, const std::vector<int> &input) {
     std::vector<int> new_sequence;
     for (int i = 0; i < input.size() - 1; i++) {
         int a = input[i];
@@ -18,16 +18,18 @@ void GenerateSequence(std::vector<std::vector<int>> &sequences, const std::vecto
         int d = b - a;
         new_sequence.push_back(d);
     }
-    sequences.push_back(new_sequence);
+    report.sequences.push_back(new_sequence);
     for (int &val : new_sequence) {
         if (val != 0) {
-            GenerateSequence(sequences, new_sequence);
+            GenerateSequence(report, new_sequence);
             return;
         }
     }
 }
 
-void GeneratePredictions(std::vector<std::vector<int>> &sequences) {
+void GeneratePredictions(Report &report) {
+    std::vector<std::vector<int>> sequences;
+    sequences = report.sequences;
     sequences[sequences.size() - 1].insert(sequences[sequences.size() - 1].begin(), 0);
     for (int i = sequences.size() - 2; i >= 0; i--) {
         int a = sequences[i].front();
@@ -56,8 +58,8 @@ int main() {
 
     int sum = 0;
     for (Report &report : reports) {
-        GenerateSequence(report.sequences, report.sequences[0]);
-        GeneratePredictions(report.sequences);
+        GenerateSequence(report, report.sequences[0]);
+        GeneratePredictions(report);
         sum += report.sequences[0].front();
     }
 
