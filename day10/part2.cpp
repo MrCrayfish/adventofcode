@@ -50,11 +50,11 @@ public:
         return a == in || b == in;
     }
 
-    bool Collision() {
+    bool IsHorizontal() {
         return a.x != 0 && b.x != 0;
     }
 
-    bool PartialCollision() {
+    bool IsCorner() {
         return a.y != 0 && b.x != 0;
     }
 };
@@ -148,43 +148,60 @@ int main() {
         }
     }
 
+    // Figured you can use the polygon technique to determine if a point is inside.
+    // Odd collisions means the point is inside, otherwise it's outside.
+
     int area = 0;
     for (int y = 0; y < grid.size(); y++) {
         for (int x = 0; x < grid[0].size(); x++) {
+
+            // If the point is on the path, skip. Only looking for non-path positions
             if (path_nodes.find({x, y}) != path_nodes.end())
                 continue;
+
             int collisions = 0;
-            int test_y = y - 1;
-            while (test_y >= 0) {
-                if (path_nodes.find({x, test_y}) != path_nodes.end()) {
-                    char c = grid[test_y][x];
-                    if (pipe_types[c].Collision()) {
-                        collisions++;
-                    } else if (pipe_types[c].PartialCollision()) {
-                        int h = pipe_types[c].b.x;
-                        test_y--;
-                        while (test_y >= 0) {
-                            c = grid[test_y][x];
-                            if (!pipe_types[c].PartialCollision()) {
-                                test_y--;
-                                continue;
-                            }
+
+            // We are testing for collision going up
+            int test_y = y;
+            while (--test_y >= 0) {
+                // If test point is not on the path, skip.
+                if (path_nodes.find({x, test_y}) == path_nodes.end())
+                    continue;
+
+                // Get the pipe at the test point
+                char c = grid[test_y][x];
+
+                // If pipe is horizontal (-) then we crossed in/out of the shape
+                if (pipe_types[c].IsHorizontal()) {
+                    collisions++;
+                    continue;
+                }
+
+                // If pipe is a corner (L or J), we need to find the above corner (F or 7)
+                if (pipe_types[c].IsCorner()) {
+
+                    // Capture the horizontal dir of the corner pipe
+                    int h = pipe_types[c].b.x;
+
+                    // Now find the above corner pipe
+                    while (--test_y > 0) {
+                        c = grid[test_y][x];
+                        if (pipe_types[c].IsCorner()) {
+                            // If above corner pipe horizontal dir is not  the same
+                            // as the captured, then we crossed in/out of the shape.
                             if (pipe_types[c].b.x != h) {
                                 collisions++;
                             }
-                            test_y--;
                             break;
                         }
-                        continue;
                     }
                 }
-                test_y--;
             }
+
+            // If collided an odd amount of times, the point was inside the path
             if (collisions % 2 == 1) {
                 area++;
-                std::cout << "Inside: " << (x + 1) << " " << (y + 1) << std::endl;
             }
-            // std::cout << "------------" << std::endl;
         }
     }
     std::cout << area << std::endl;
