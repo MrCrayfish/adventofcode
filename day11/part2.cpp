@@ -4,9 +4,9 @@
 #include <map>
 #include <memory>
 #include <numeric>
+#include <set>
 #include <sstream>
 #include <string>
-#include <unordered_set>
 #include <vector>
 
 struct Galaxy {
@@ -29,8 +29,8 @@ public:
 main() {
     std::vector<Galaxy> galaxies;
     std::vector<Path> paths;
-    std::unordered_set<int> occupied_columns;
-    std::unordered_set<int> occupied_rows;
+    std::set<int> occupied_columns;
+    std::set<int> occupied_rows;
 
     int y = 0;
     std::string line;
